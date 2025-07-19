@@ -1,65 +1,86 @@
-// firebase.js
+// analysis.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+const tableBody = document.querySelector("#resultsTable tbody");
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyB_hiukwxN-ftyTQjhn7bwkvq0UntljUW4",
   authDomain: "ideation-tool-8bcf3.firebaseapp.com",
-  projectId: "ideation-tool-8bcf3",
-  storageBucket: "ideation-tool-8bcf3.firebasestorage.app",
-  messagingSenderId: "962170855843",
-  appId: "1:962170855843:web:8aebfea8944d8104aa3a16",
-  measurementId: "G-4YWL4713T3"
+  projectId: "ideation-tool-8bcf3"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ✅ add this to your firebase.js
+const detailTableBody = document.querySelector("#detailTable tbody");
+const summaryTableBody = document.querySelector("#scoreTable tbody");
+const chipContainer = document.getElementById("chipFilter");
 
-export async function saveUsernameToDB(name, topic = "") {
-  try {
-    await addDoc(collection(db, "participants"), {
-      username: name,
-      topic: topic,
-      timestamp: new Date().toISOString()
-    });
-    console.log("✅ 이름 저장 성공!");
-  } catch (e) {
-    console.error("🔥 이름 저장 실패:", e);
-  }
+let allRatings = [];
+
+function updateDetailTable(category) {
+  detailTableBody.innerHTML = "";
+  const filtered = category === "all" ? allRatings : allRatings.filter(r => r.category === category);
+  filtered.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.name}</td>
+      <td>${row.topic}</td>
+      <td>${row.category}</td>
+      <td>${row.score}</td>
+    `;
+    detailTableBody.appendChild(tr);
+  });
 }
 
+function updateSummaryTable() {
+  summaryTableBody.innerHTML = "";
+  const categoryGroups = {};
+  allRatings.forEach(row => {
+    if (!categoryGroups[row.category]) categoryGroups[row.category] = [];
+    categoryGroups[row.category].push(Number(row.score));
+  });
 
-// ✅ 외부에서 접근할 수 있게 export
-export async function saveFullResultsToDB(username, topic, promptHistory, gptResponses, ratingHistory) {
-  const results = {};
-
-  for (let i = 1; i <= 6; i++) {
-    const qKey = `Q${i}`;
-    results[qKey] = {
-      input: promptHistory[qKey] || "",
-      gptResponse: gptResponses[qKey] || "",
-      rating: ratingHistory[qKey]?.['별점 평가'] || {},
-      기타_의견: ratingHistory[qKey]?.['기타 의견'] || ""
-    };
-  }
-
-  try {
-    await addDoc(collection(db, "results"), {
-      username,
-      topic,
-      timestamp: new Date().toISOString(),
-      results
-    });
-    console.log("✅ 전체 결과 Firestore에 저장 완료!");
-
-    // ✅ 여기서 성공 후 alert + reload
-    alert("실험에 참여해주셔서 감사합니다 :)");
-    location.reload();
-
-  } catch (e) {
-    console.error("🔥 전체 결과 저장 실패:", e);
-    alert("⚠️ 저장에 실패했어요. 다시 시도해주세요!");
-  }
+  Object.entries(categoryGroups).forEach(([category, scores]) => {
+    const avg = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${category}</td>
+      <td>${avg}</td>
+    `;
+    summaryTableBody.appendChild(tr);
+  });
 }
+
+chipContainer.addEventListener("click", (e) => {
+  if (e.target.classList.contains("chip")) {
+    document.querySelectorAll(".chip").forEach(chip => chip.classList.remove("active"));
+    e.target.classList.add("active");
+    const category = e.target.dataset.category;
+    updateDetailTable(category);
+  }
+});
+
+async function fetchRatings() {
+  const querySnapshot = await getDocs(collection(db, "results"));
+  querySnapshot.forEach(doc => {
+    const data = doc.data();
+    const name = data.username || "-";
+    const topic = data.topic || "-";
+    const results = data.results || {};
+
+    Object.values(results).forEach(entry => {
+      const rating = entry.rating || {};
+      Object.entries(rating).forEach(([category, score]) => {
+        if (!isNaN(score)) {
+          allRatings.push({ name, topic, category, score });
+        }
+      });
+    });
+  });
+  updateDetailTable("all");
+  updateSummaryTable();
+}
+
+fetchRatings();
