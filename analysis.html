@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⭐ 실험 별점 분석</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      margin: 2rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+    .chip-container {
+      margin: 1rem 0;
+    }
+    .chip {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      background-color: #e0e0e0;
+      border-radius: 999px;
+      margin: 0.2rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .chip.active {
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+  <script type="module" src="./analysis.js"></script>
+</head>
+<body>
+  <h1>⭐ 실험 별점 분석 페이지</h1>
+
+  <div class="chip-container" id="chipFilter">
+    <span class="chip active" data-category="all">전체</span>
+    <span class="chip" data-category="창의성">창의성</span>
+    <span class="chip" data-category="실현 가능성">실현 가능성</span>
+    <span class="chip" data-category="문제 해결력">문제 해결력</span>
+    <span class="chip" data-category="구체성">구체성</span>
+    <span class="chip" data-category="명확성">명확성</span>
+    <span class="chip" data-category="영향력">영향력</span>
+    <span class="chip" data-category="완성도">완성도</span>
+  </div>
+
+  <section id="summary">
+    <h2>기준별 평균 점수</h2>
+    <table id="scoreTable">
+      <thead>
+        <tr>
+          <th>기준</th>
+          <th>평균 점수</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</body>
+<script type="module" src="./analysis.js"></script>
+
+</html>
