@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -10,15 +9,53 @@
 </head>
 <body>
   <h1>🧪 실험 리포지토리</h1>
+  <div id="topicChips" style="margin-bottom: 1rem; display: flex; gap: 8px; flex-wrap: wrap;"></div>
+<div class="function-wrapper">
+  <p id="participantCount" style="font-weight: bold; margin-bottom: 1rem;">총 참여자 수: 0명</p>
+ <div class="toggle-container">
+  <label class="switch">
+    <input type="checkbox" id="unlockDelete" />
+    <span class="slider round"></span>
+  </label>
+  <span style="margin-left: 10px;">삭제 잠금</span>
+</div>
+</div>
   <table id="resultsTable">
     <thead>
       <tr>
-        <th>이름</th><th>주제</th><th>제출시간</th><th>평균 별점</th><th>상세보기</th>
+        <th>이름</th><th>주제</th><th>평균 별점</th><th>상세보기</th>
+      <label style="display: flex; align-items: center; gap: 6px; margin: 8px 0;">
+ 
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+<button class="delete-btn" disabled>삭제</button>
+
+  <div id="detailModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span id="closeModal">&times;</span>
+      <pre id="detailContent"></pre>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+</body>
+</html>
+
+  <table id="resultsTable">
+    <thead>
+      <tr>
+        <th>이름</th><th>주제</th><th>평균 별점</th><th>상세보기</th>
       
       </tr>
     </thead>
     <tbody></tbody>
   </table>
+  
+<button class="delete-btn" disabled>삭제</button>
 
   <div id="detailModal" class="modal" style="display: none;">
     <div class="modal-content">
